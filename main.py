@@ -49,6 +49,28 @@ class ChoCoBot(commands.Bot):
 bot = ChoCoBot(command_prefix="!", intents=intents)
 
 
+@bot.tree.command(name="cl", description="chửi cholam", guild=GUILD)
+async def cl(interaction: discord.Interaction):
+    try:
+        cholam = await bot.fetch_user(623127730678005780)
+        await interaction.response.send_message(
+            f"dm {cholam.mention}"
+        )
+    except discord.NotFound:
+        await interaction.response.send_message(
+            "ôi không, có vẻ như cholam đã chết rồi :( widepeepoSadge"
+        )
+    except discord.HTTPException:
+        pass
+
+
+@bot.tree.command(name="coin", description="tung đồng xu", guild=GUILD)
+async def coin(interaction: discord.Interaction):
+    await interaction.response.send_message(
+        f"{interaction.user.mention} {'ngửa' if round(random.random()) else 'sấp'}"
+    )
+
+
 @bot.tree.command(name="dm", description="du ma", guild=GUILD)
 async def dm(interaction: discord.Interaction):
     # fromis_9(프로미스나인) \"DM\" M/V
@@ -62,7 +84,7 @@ async def pp(interaction: discord.Interaction):
     low, high = (15.0, 30.0) if interaction.user.id in WHITELIST else (-5.0, 20.0)
     dick_len = round(random.uniform(low, high), 1)
     await interaction.response.send_message(
-        f"{interaction.user.mention}, chim của bạn dài {dick_len} cm."
+        f"{interaction.user.mention} chim của bạn dài {dick_len} cm"
     )
 
 
@@ -83,10 +105,10 @@ async def yoy(interaction: discord.Interaction):
 
 
 @bot.tree.command(name="banword", description="thêm một từ vào danh sách pbct", guild=GUILD)
-async def banword(interaction: discord.Interaction, word: str):
+async def ban_word(interaction: discord.Interaction, word: str):
     if not interaction.user.guild_permissions.administrator:
         await interaction.response.send_message(
-            f"{interaction.user.mention}, bạn không có quyền sử dụng lệnh này!"
+            f"{interaction.user.mention} bạn không có quyền sử dụng lệnh này!"
         )
         return
 
@@ -96,19 +118,19 @@ async def banword(interaction: discord.Interaction, word: str):
 
     if add_racism_word(word, guild_id, user_id):
         await interaction.response.send_message(
-            f"{interaction.user.mention}, `{word}` đã được thêm vào danh sách pbct!"
+            f"{interaction.user.mention} *{word}* đã được thêm vào danh sách pbct!"
         )
     else:
         await interaction.response.send_message(
-            f"{interaction.user.mention}, `{word}` đã có trong danh sách pbct rồi!"
+            f"{interaction.user.mention} *{word}* đã có trong danh sách pbct rồi!"
         )
 
 
 @bot.tree.command(name="unbanword", description="xóa một từ khỏi danh sách pbct", guild=GUILD)
-async def unbanword(interaction: discord.Interaction, word: str):
+async def unban_word(interaction: discord.Interaction, word: str):
     if not interaction.user.guild_permissions.administrator:
         await interaction.response.send_message(
-            f"{interaction.user.mention}, bạn không có quyền sử dụng lệnh này!"
+            f"{interaction.user.mention} bạn không có quyền sử dụng lệnh này!"
         )
         return
 
@@ -117,11 +139,11 @@ async def unbanword(interaction: discord.Interaction, word: str):
 
     if remove_racism_word(word, guild_id):
         await interaction.response.send_message(
-            f"{interaction.user.mention}, `{word}` đã được xóa khỏi danh sách pbct!"
+            f"{interaction.user.mention} *{word}* đã được xóa khỏi danh sách pbct!"
         )
     else:
         await interaction.response.send_message(
-            f"{interaction.user.mention}, `{word}` không tồn tại trong danh sách pbct!"
+            f"{interaction.user.mention} *{word}* không tồn tại trong danh sách pbct!"
         )
 
 
