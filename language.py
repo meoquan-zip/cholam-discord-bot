@@ -1,3 +1,4 @@
+import re
 import unicodedata
 
 
@@ -7,5 +8,11 @@ def strip_accents(text: str) -> str:
     return text.translate(str.maketrans({'Đ': 'D', 'đ': 'd'}))
 
 
-def strip_accents_lower(text: str) -> str:
-    return strip_accents(text).lower()
+def remove_invisible(text: str) -> str:
+    return re.compile(r"[\u200B-\u200D\u2060\u180E\u00A0]").sub("", text)
+
+
+def normalise(text: str) -> str:
+    text = strip_accents(text)
+    text = remove_invisible(text)
+    return re.sub(r"[^a-z0-9]", "", text.lower())

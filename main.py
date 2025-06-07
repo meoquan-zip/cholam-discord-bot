@@ -34,23 +34,35 @@ class ChoCoBot(commands.Bot):
         if message.author.bot or not message.guild:
             return
 
+        content = normalise(message.content)
+
+        if not content:
+            return
+
         user_id = message.author.id
         guild_id = message.guild.id
-        content_std = strip_accents_lower(message.content)  # standardised content
         racism_words = get_racism_words(guild_id)
 
-        if any(word in content_std for word in racism_words):
+        if any(word in content for word in racism_words):
             count = increase_and_get_racism_count(user_id, guild_id)
             await message.channel.send(
-                f"{message.author.mention}, bạn đã phân biệt chủng tộc {count} lần."
+                f"{message.author.mention} bạn đã phân biệt chủng tộc {count} lần."
             )
 
 
 bot = ChoCoBot(command_prefix="!", intents=intents)
 
 
+@bot.tree.command(name="10min", description="anh iem đợi tôi 10 phút", guild=GUILD)
+async def slash_10_minutes(interaction: discord.Interaction):
+    # Lee Hyori(이효리) "10 Minutes" M/V
+    await interaction.response.send_message(
+        "https://youtu.be/iKdr44yEBQU"
+    )
+
+
 @bot.tree.command(name="cl", description="chửi cholam", guild=GUILD)
-async def cl(interaction: discord.Interaction):
+async def slash_cholam(interaction: discord.Interaction):
     try:
         cholam = await bot.fetch_user(623127730678005780)
         await interaction.response.send_message(
@@ -65,22 +77,22 @@ async def cl(interaction: discord.Interaction):
 
 
 @bot.tree.command(name="coin", description="tung đồng xu", guild=GUILD)
-async def coin(interaction: discord.Interaction):
+async def slash_coinflip(interaction: discord.Interaction):
     await interaction.response.send_message(
         f"{interaction.user.mention} {'ngửa' if round(random.random()) else 'sấp'}"
     )
 
 
 @bot.tree.command(name="dm", description="du ma", guild=GUILD)
-async def dm(interaction: discord.Interaction):
-    # fromis_9(프로미스나인) \"DM\" M/V
+async def slash_dm(interaction: discord.Interaction):
+    # fromis_9(프로미스나인) "DM" M/V
     await interaction.response.send_message(
-        r"https://youtu.be/4gXmClk8rKI"
+        "https://youtu.be/4gXmClk8rKI"
     )
 
 
 @bot.tree.command(name="pp", description="đo kích thước cậu nhỏ của bạn", guild=GUILD)
-async def pp(interaction: discord.Interaction):
+async def slash_pp(interaction: discord.Interaction):
     low, high = (15.0, 30.0) if interaction.user.id in WHITELIST else (-5.0, 20.0)
     dick_len = round(random.uniform(low, high), 1)
     await interaction.response.send_message(
@@ -89,32 +101,39 @@ async def pp(interaction: discord.Interaction):
 
 
 @bot.tree.command(name="ynm", description="có? không? có thể?", guild=GUILD)
-async def ynm(interaction: discord.Interaction):
-    # Suzy(수지) \"Yes No Maybe\" M/V
+async def slash_yes_no_maybe(interaction: discord.Interaction):
+    # Suzy(수지) "Yes No Maybe" M/V
     await interaction.response.send_message(
-        r"https://youtu.be/b34ri3-uxks"
+        "https://youtu.be/b34ri3-uxks"
     )
 
 
 @bot.tree.command(name="yoy", description="có hoặc có?", guild=GUILD)
-async def yoy(interaction: discord.Interaction):
-    # TWICE(트와이스) \"YES or YES\" M/V
+async def slash_yes_or_yes(interaction: discord.Interaction):
+    # TWICE(트와이스) "YES or YES" M/V
     await interaction.response.send_message(
-        r"https://youtu.be/mAKsZ26SabQ"
+        "https://youtu.be/mAKsZ26SabQ"
     )
 
 
 @bot.tree.command(name="banword", description="thêm một từ vào danh sách pbct", guild=GUILD)
-async def ban_word(interaction: discord.Interaction, word: str):
+async def slash_ban_word(interaction: discord.Interaction, word: str):
     if not interaction.user.guild_permissions.administrator:
         await interaction.response.send_message(
             f"{interaction.user.mention} bạn không có quyền sử dụng lệnh này!"
         )
         return
 
+    word = normalise(word)
+
+    if not word:
+        await interaction.response.send_message(
+            f"{interaction.user.mention} từ bạn vừa nhập không hợp lệ!"
+        )
+        return
+
     guild_id = interaction.guild.id
     user_id = interaction.user.id
-    word = strip_accents_lower(word)
 
     if add_racism_word(word, guild_id, user_id):
         await interaction.response.send_message(
@@ -127,15 +146,22 @@ async def ban_word(interaction: discord.Interaction, word: str):
 
 
 @bot.tree.command(name="unbanword", description="xóa một từ khỏi danh sách pbct", guild=GUILD)
-async def unban_word(interaction: discord.Interaction, word: str):
+async def slash_unban_word(interaction: discord.Interaction, word: str):
     if not interaction.user.guild_permissions.administrator:
         await interaction.response.send_message(
             f"{interaction.user.mention} bạn không có quyền sử dụng lệnh này!"
         )
         return
 
+    word = normalise(word)
+
+    if not word:
+        await interaction.response.send_message(
+            f"{interaction.user.mention} từ bạn vừa nhập không hợp lệ!"
+        )
+        return
+
     guild_id = interaction.guild.id
-    word = strip_accents_lower(word)
 
     if remove_racism_word(word, guild_id):
         await interaction.response.send_message(
