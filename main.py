@@ -60,6 +60,13 @@ async def slash_10_minutes(interaction: discord.Interaction):
     )
 
 
+@bot.tree.command(name="bca", description="báo cáo anh chưa có ghế cho sếp ạ", guild=GUILD)
+async def slash_bao_cao_anh(interaction: discord.Interaction):
+    await interaction.response.send_message(
+        "https://youtu.be/dgVrffcBMqA"
+    )
+
+
 @bot.tree.command(name="cl", description="chửi cholam", guild=GUILD)
 async def slash_cholam(interaction: discord.Interaction):
     try:
