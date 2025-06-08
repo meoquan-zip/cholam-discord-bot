@@ -1,5 +1,7 @@
+import inspect
 import os
 import sqlite3
+import sys
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "discord.db")
@@ -59,6 +61,7 @@ def create_racism_words_table():
             "word" TEXT NOT NULL,
             "guild_id" INTEGER NOT NULL,
             "added_by" INTEGER NOT NULL,
+            "added_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY("word", "guild_id")
         )
     """)
@@ -110,3 +113,11 @@ def remove_racism_word(word: str, guild_id: int) -> bool:
     con.close()
 
     return changes > 0
+
+
+def init_database():
+    module = sys.modules[__name__]
+    for name, func in inspect.getmembers(module, inspect.isfunction):
+        if name.startswith("create_"):
+            print(f"Initialising DB: Running {name}()")
+            func()

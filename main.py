@@ -9,7 +9,7 @@ from language import *
 load_dotenv()  # load variables from .env
 TOKEN = os.getenv("DISCORD_TOKEN")  # bot token to log in
 GUILD = discord.Object(id=867657564883386438)  # test server
-WHITELIST = {
+GOD_TIER = {
     866878611063701525: "speaver",
     690179037397778477: "meoquan"
 }
@@ -22,8 +22,7 @@ intents.members = True
 class ChoCoBot(commands.Bot):
     async def on_ready(self):
         print(f"Logged in as {self.user}!")
-        # sync slash commands to test server
-        try:
+        try:  # sync slash commands to test server
             synced = await self.tree.sync(guild=GUILD)
             suffix = "" if len(synced) == 1 else "s"
             print(f"Synced {len(synced)} command{suffix} to Guild {GUILD.id}!")
@@ -93,7 +92,7 @@ async def slash_dm(interaction: discord.Interaction):
 
 @bot.tree.command(name="pp", description="đo kích thước cậu nhỏ của bạn", guild=GUILD)
 async def slash_pp(interaction: discord.Interaction):
-    low, high = (15.0, 30.0) if interaction.user.id in WHITELIST else (-5.0, 20.0)
+    low, high = (15.0, 30.0) if interaction.user.id in GOD_TIER else (-5.0, 20.0)
     dick_len = round(random.uniform(low, high), 1)
     await interaction.response.send_message(
         f"{interaction.user.mention} chim của bạn dài {dick_len} cm"
@@ -173,6 +172,5 @@ async def slash_unban_word(interaction: discord.Interaction, word: str):
         )
 
 
-create_users_per_guild_table()
-create_racism_words_table()
+init_database()
 bot.run(TOKEN)
