@@ -22,12 +22,19 @@ intents.members = True
 class ChoCoBot(commands.Bot):
     async def on_ready(self):
         print(f"Logged in as {self.user}!")
+
+        try:  # initialise database
+            init_database()
+            print(f"Database initialised!")
+        except Exception as e:
+            print(f"Failed to initialise database: {e}")
+
         try:  # sync slash commands to test server
             synced = await self.tree.sync(guild=GUILD)
             suffix = "" if len(synced) == 1 else "s"
-            print(f"Synced {len(synced)} command{suffix} to Guild {GUILD.id}!")
+            print(f"{len(synced)} command{suffix} synced to Guild {GUILD.id}!")
         except Exception as e:
-            print(f"Failed to sync: {e}")
+            print(f"Failed to sync commands: {e}")
 
     async def on_message(self, message):
         if message.author.bot or not message.guild:
@@ -179,5 +186,4 @@ async def slash_unban_word(interaction: discord.Interaction, word: str):
         )
 
 
-init_database()
 bot.run(TOKEN)

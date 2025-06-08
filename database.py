@@ -115,9 +115,10 @@ def remove_racism_word(word: str, guild_id: int) -> bool:
     return changes > 0
 
 
-def init_database():
+def init_database(verbose: bool = False):
     module = sys.modules[__name__]
     for name, func in inspect.getmembers(module, inspect.isfunction):
         if name.startswith("create_"):
-            print(f"Initialising DB: Running {name}()")
             func()
+            if verbose:
+                print(f"Initialising database: Running {name}()")
