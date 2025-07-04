@@ -1,13 +1,16 @@
-import discord
+import asyncio
 import random
-from discord import app_commands
+
+import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+from google import generativeai as genai
+
 from database import *
 from language import *
 
-load_dotenv()  # load variables from .env
-TOKEN = os.getenv('DISCORD_TOKEN')  # bot token to log in
+load_dotenv()  # load environment variables from .env
+
 GUILD = discord.Object(id=867657564883386438)  # test server
 GOD_TIER = {
     866878611063701525: 'speaver',
@@ -20,6 +23,11 @@ intents.members = True
 
 
 class ChoCoBot(commands.Bot):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
+        self.genai_model = genai.GenerativeModel('gemini-2.0-flash')
+
     async def on_ready(self):
         print(f'Logged in as {self.user}!')
 
@@ -61,10 +69,24 @@ bot = ChoCoBot(command_prefix='!', intents=intents)
 
 @bot.tree.command(name='10min', description='anh iem đợi tôi 10 phút', guild=GUILD)
 async def slash_10_minutes(interaction: discord.Interaction):
-    # Lee Hyori(이효리) '10 Minutes' M/V
+    # Lee Hyori(이효리) "10 Minutes" M/V
     await interaction.response.send_message(
         'https://youtu.be/iKdr44yEBQU'
     )
+
+
+@bot.tree.command(name='ask', description='sử dụng genai chatbot', guild=GUILD)
+async def slash_ask(interaction: discord.Interaction, prompt: str):
+    try:
+        response = await asyncio.to_thread(bot.genai_model.generate_content, prompt)
+        await interaction.response.send_message(
+            f'{interaction.user.mention}: {prompt}\n\n{response.text}'
+        )
+    except Exception as e:
+        print(f'Failed to generate response: {e}')
+        await interaction.response.send_message(
+            f'{interaction.user.mention} đã xảy ra lỗi kỹ thuật, xin hãy thử lại sau!'
+        )
 
 
 @bot.tree.command(name='bca', description='báo cáo anh chưa có ghế cho sếp ạ', guild=GUILD)
@@ -115,7 +137,7 @@ async def slash_pp(interaction: discord.Interaction):
 
 @bot.tree.command(name='ynm', description='có? không? có thể?', guild=GUILD)
 async def slash_yes_no_maybe(interaction: discord.Interaction):
-    # Suzy(수지) 'Yes No Maybe' M/V
+    # Suzy(수지) "Yes No Maybe" M/V
     await interaction.response.send_message(
         'https://youtu.be/b34ri3-uxks'
     )
@@ -123,7 +145,7 @@ async def slash_yes_no_maybe(interaction: discord.Interaction):
 
 @bot.tree.command(name='yoy', description='có hoặc có?', guild=GUILD)
 async def slash_yes_or_yes(interaction: discord.Interaction):
-    # TWICE(트와이스) 'YES or YES' M/V
+    # TWICE(트와이스) "YES or YES" M/V
     await interaction.response.send_message(
         'https://youtu.be/mAKsZ26SabQ'
     )
@@ -186,4 +208,4 @@ async def slash_unban_word(interaction: discord.Interaction, word: str):
         )
 
 
-bot.run(TOKEN)
+bot.run(os.getenv('DISCORD_TOKEN'))
