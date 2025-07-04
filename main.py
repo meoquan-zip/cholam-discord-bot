@@ -137,9 +137,9 @@ async def slash_ban_word(interaction: discord.Interaction, word: str):
         )
         return
 
-    word = normalise(word)
+    word_norm = normalise(word)
 
-    if not word:
+    if not word_norm:
         await interaction.response.send_message(
             f'{interaction.user.mention} từ bạn vừa nhập không hợp lệ!'
         )
@@ -148,13 +148,13 @@ async def slash_ban_word(interaction: discord.Interaction, word: str):
     guild_id = interaction.guild.id
     user_id = interaction.user.id
 
-    if add_racism_word(word, guild_id, user_id):
+    if add_racism_word(word_norm, guild_id, user_id):
         await interaction.response.send_message(
-            f'{interaction.user.mention} *{word}* đã được thêm vào danh sách pbct!'
+            f'{interaction.user.mention} `{word}` đã được thêm vào danh sách pbct!'
         )
     else:
         await interaction.response.send_message(
-            f'{interaction.user.mention} *{word}* đã có trong danh sách pbct rồi!'
+            f'{interaction.user.mention} `{word}` đã có trong danh sách pbct rồi!'
         )
 
 
@@ -166,9 +166,9 @@ async def slash_unban_word(interaction: discord.Interaction, word: str):
         )
         return
 
-    word = normalise(word)
+    word_norm = normalise(word)
 
-    if not word:
+    if not word_norm:
         await interaction.response.send_message(
             f'{interaction.user.mention} từ bạn vừa nhập không hợp lệ!'
         )
@@ -176,13 +176,13 @@ async def slash_unban_word(interaction: discord.Interaction, word: str):
 
     guild_id = interaction.guild.id
 
-    if remove_racism_word(word, guild_id):
+    if remove_racism_word(word_norm, guild_id):
         await interaction.response.send_message(
-            f'{interaction.user.mention} *{word}* đã được xóa khỏi danh sách pbct!'
+            f'{interaction.user.mention} `{word}` đã được xóa khỏi danh sách pbct!'
         )
     else:
         await interaction.response.send_message(
-            f'{interaction.user.mention} *{word}* không tồn tại trong danh sách pbct!'
+            f'{interaction.user.mention} `{word}` không tồn tại trong danh sách pbct!'
         )
 
 
