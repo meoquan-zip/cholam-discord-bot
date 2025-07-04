@@ -4,18 +4,19 @@ import sqlite3
 import sys
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "discord.db")
+DB_PATH = os.path.join(BASE_DIR, 'discord.db')
 
 
 def create_users_per_guild_table():
     con = sqlite3.connect(DB_PATH)
     cur = con.cursor()
     cur.execute("""
-        CREATE TABLE IF NOT EXISTS "users_per_guild" (
-            "user_id" INTEGER NOT NULL,
-            "guild_id" INTEGER NOT NULL,
-            "racism_count" INTEGER NOT NULL DEFAULT 0,
-            PRIMARY KEY("user_id", "guild_id")
+        CREATE TABLE IF NOT EXISTS users_per_guild
+        (
+            user_id      INTEGER NOT NULL,
+            guild_id     INTEGER NOT NULL,
+            racism_count INTEGER NOT NULL DEFAULT 0,
+            PRIMARY KEY (user_id, guild_id)
         )
     """)
     con.commit()
@@ -26,9 +27,10 @@ def increase_and_get_racism_count(user_id: int, guild_id: int) -> int:
     con = sqlite3.connect(DB_PATH)
     cur = con.cursor()
     cur.execute("""
-        SELECT racism_count 
+        SELECT racism_count
         FROM users_per_guild
-        WHERE (user_id = ?) AND (guild_id = ?)
+        WHERE user_id = ?
+          AND guild_id = ?
     """, (user_id, guild_id))
     racism_count = cur.fetchone()
 
@@ -45,7 +47,8 @@ def increase_and_get_racism_count(user_id: int, guild_id: int) -> int:
     cur.execute("""
         UPDATE users_per_guild
         SET racism_count = ?
-        WHERE (user_id = ?) AND (guild_id = ?)
+        WHERE user_id = ?
+          AND guild_id = ?
     """, (racism_count, user_id, guild_id))
     con.commit()
     con.close()
@@ -57,12 +60,13 @@ def create_racism_words_table():
     con = sqlite3.connect(DB_PATH)
     cur = con.cursor()
     cur.execute("""
-        CREATE TABLE IF NOT EXISTS "racism_words" (
-            "word" TEXT NOT NULL,
-            "guild_id" INTEGER NOT NULL,
-            "added_by" INTEGER NOT NULL,
-            "added_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY("word", "guild_id")
+        CREATE TABLE IF NOT EXISTS racism_words
+        (
+            word     TEXT      NOT NULL,
+            guild_id INTEGER   NOT NULL,
+            added_by INTEGER   NOT NULL,
+            added_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (word, guild_id)
         )
     """)
     con.commit()
@@ -104,8 +108,10 @@ def remove_racism_word(word: str, guild_id: int) -> bool:
     con = sqlite3.connect(DB_PATH)
     cur = con.cursor()
     cur.execute("""
-        DELETE FROM racism_words
-        WHERE (word = ?) AND (guild_id = ?)
+        DELETE
+        FROM racism_words
+        WHERE word = ?
+          AND guild_id = ?
     """, (word, guild_id))
 
     changes = cur.rowcount  # number of rows affected by the DELETE
@@ -118,7 +124,7 @@ def remove_racism_word(word: str, guild_id: int) -> bool:
 def init_database(verbose: bool = False):
     module = sys.modules[__name__]
     for name, func in inspect.getmembers(module, inspect.isfunction):
-        if name.startswith("create_"):
+        if name.startswith('create_'):
             func()
             if verbose:
-                print(f"Initialising database: Running {name}()")
+                print(f'Initialising database: Running {name}()')
