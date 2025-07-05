@@ -26,8 +26,19 @@ intents.members = True
 class ChoCoBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        try:
+            with open('genai-system-instruction.txt', encoding='utf-8') as f:
+                system_instruction = f.read()
+        except FileNotFoundError:
+            print('Warning: instruction file not found, using default instruction')
+            system_instruction = 'You are ChoCoBot, a helpful Discord bot assistant.'
+
         genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
-        self.genai_model = genai.GenerativeModel('gemini-2.0-flash')
+        self.genai_model = genai.GenerativeModel(
+            'gemini-2.0-flash',
+            system_instruction=system_instruction
+        )
 
     async def on_ready(self):
         print(f'Logged in as {self.user}!')
@@ -76,7 +87,7 @@ async def slash_10_minutes(interaction: discord.Interaction):
     )
 
 
-@bot.tree.command(name='ask', description='sử dụng genai chatbot', guild=GUILD)
+@bot.tree.command(name='ask', description='trò chuyện với chatbot', guild=GUILD)
 async def slash_ask(interaction: discord.Interaction, prompt: str):
     try:
         response = await asyncio.to_thread(bot.genai_model.generate_content, prompt)
@@ -152,7 +163,7 @@ async def slash_yes_or_yes(interaction: discord.Interaction):
     )
 
 
-@bot.tree.command(name='banword', description='thêm một từ vào danh sách pbct', guild=GUILD)
+@bot.tree.command(name='banword', description='thêm một từ vào danh sách cấm', guild=GUILD)
 async def slash_ban_word(interaction: discord.Interaction, word: str):
     if not interaction.user.guild_permissions.administrator:
         await interaction.response.send_message(
@@ -173,15 +184,15 @@ async def slash_ban_word(interaction: discord.Interaction, word: str):
 
     if add_racism_word(word_norm, guild_id, user_id):
         await interaction.response.send_message(
-            f'{interaction.user.mention} `{word}` đã được thêm vào danh sách pbct!'
+            f'{interaction.user.mention} `{word}` đã được thêm vào danh sách cấm!'
         )
     else:
         await interaction.response.send_message(
-            f'{interaction.user.mention} `{word}` đã có trong danh sách pbct rồi!'
+            f'{interaction.user.mention} `{word}` đã có trong danh sách cấm rồi!'
         )
 
 
-@bot.tree.command(name='unbanword', description='xóa một từ khỏi danh sách pbct', guild=GUILD)
+@bot.tree.command(name='unbanword', description='xóa một từ khỏi danh sách cấm', guild=GUILD)
 async def slash_unban_word(interaction: discord.Interaction, word: str):
     if not interaction.user.guild_permissions.administrator:
         await interaction.response.send_message(
@@ -201,11 +212,11 @@ async def slash_unban_word(interaction: discord.Interaction, word: str):
 
     if remove_racism_word(word_norm, guild_id):
         await interaction.response.send_message(
-            f'{interaction.user.mention} `{word}` đã được xóa khỏi danh sách pbct!'
+            f'{interaction.user.mention} `{word}` đã được xóa khỏi danh sách cấm!'
         )
     else:
         await interaction.response.send_message(
-            f'{interaction.user.mention} `{word}` không tồn tại trong danh sách pbct!'
+            f'{interaction.user.mention} `{word}` không tồn tại trong danh sách cấm!'
         )
 
 
