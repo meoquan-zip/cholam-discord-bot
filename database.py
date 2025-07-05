@@ -1,13 +1,11 @@
-import inspect
 import os
 import sqlite3
-import sys
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, 'discord.db')
 
 
-def create_users_per_guild_table():
+def init_database():
     con = sqlite3.connect(DB_PATH)
     cur = con.cursor()
     cur.execute("""
@@ -17,6 +15,16 @@ def create_users_per_guild_table():
             guild_id     INTEGER NOT NULL,
             racism_count INTEGER NOT NULL DEFAULT 0,
             PRIMARY KEY (user_id, guild_id)
+        )
+    """)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS racism_words
+        (
+            word     TEXT      NOT NULL,
+            guild_id INTEGER   NOT NULL,
+            added_by INTEGER   NOT NULL,
+            added_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (word, guild_id)
         )
     """)
     con.commit()
@@ -54,23 +62,6 @@ def increase_and_get_racism_count(user_id: int, guild_id: int) -> int:
     con.close()
 
     return racism_count
-
-
-def create_racism_words_table():
-    con = sqlite3.connect(DB_PATH)
-    cur = con.cursor()
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS racism_words
-        (
-            word     TEXT      NOT NULL,
-            guild_id INTEGER   NOT NULL,
-            added_by INTEGER   NOT NULL,
-            added_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (word, guild_id)
-        )
-    """)
-    con.commit()
-    con.close()
 
 
 def get_racism_words(guild_id: int) -> list[str]:
@@ -119,12 +110,3 @@ def remove_racism_word(word: str, guild_id: int) -> bool:
     con.close()
 
     return changes > 0
-
-
-def init_database(verbose: bool = False):
-    module = sys.modules[__name__]
-    for name, func in inspect.getmembers(module, inspect.isfunction):
-        if name.startswith('create_'):
-            func()
-            if verbose:
-                print(f'Initialising database: Running {name}()')
