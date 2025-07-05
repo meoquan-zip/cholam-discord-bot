@@ -7,7 +7,8 @@ from dotenv import load_dotenv
 from google import generativeai as genai
 
 from database import *
-from language import *
+from keep_alive import keep_alive
+from language import normalise
 
 load_dotenv()  # load environment variables from .env
 
@@ -208,4 +209,5 @@ async def slash_unban_word(interaction: discord.Interaction, word: str):
         )
 
 
+keep_alive()  # prevent bot from automatically shutting down
 bot.run(os.getenv('DISCORD_TOKEN'))
