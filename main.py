@@ -11,6 +11,7 @@ from keep_alive import keep_alive
 from language import normalise
 
 load_dotenv()  # load environment variables from .env
+keep_alive()  # prevent bot from automatically shutting down
 
 GUILD = discord.Object(id=867657564883386438)  # test server
 GOD_TIER = {
@@ -220,5 +221,4 @@ async def slash_unban_word(interaction: discord.Interaction, word: str):
         )
 
 
-keep_alive()  # prevent bot from automatically shutting down
 bot.run(os.getenv('DISCORD_TOKEN'))
