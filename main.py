@@ -133,7 +133,7 @@ async def slash_coinflip(interaction: discord.Interaction):
 
 @bot.tree.command(name='dm', description='du ma', guild=GUILD)
 async def slash_dm(interaction: discord.Interaction):
-    # fromis_9(프로미스나인) 'DM' M/V
+    # fromis_9(프로미스나인) "DM" M/V
     await interaction.response.send_message(
         'https://youtu.be/4gXmClk8rKI'
     )
