@@ -1,12 +1,12 @@
 from threading import Thread
-from flask import Flask
+from flask import Flask, render_template
 
 app = Flask('')
 
 
 @app.route('/')
 def home():
-    return 'Bot is running!'
+    return render_template('index.html')
 
 
 def run():
