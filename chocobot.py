@@ -29,7 +29,7 @@ class ChoCoBot(commands.Bot):
         super().__init__(*args, **kwargs)
 
         try:
-            with open('genai-instruction.txt', encoding='utf-8') as f:
+            with open('genai/instruction.txt', encoding='utf-8') as f:
                 system_instruction = f.read()
         except FileNotFoundError:
             print('Warning: instruction file not found, using default instruction')
