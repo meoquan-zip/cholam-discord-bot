@@ -2,6 +2,7 @@ import asyncio
 import random
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 from dotenv import load_dotenv
 from google import generativeai as genai
@@ -86,7 +87,8 @@ async def slash_10_minutes(interaction: discord.Interaction):
 
 
 @bot.tree.command(name='ask', description='trò chuyện với chatbot', guild=GUILD)
-async def slash_ask(interaction: discord.Interaction, prompt: str):
+async def slash_ask(interaction: discord.Interaction,
+                    prompt: app_commands.Range[str, 1, 150]):
     try:
         response = await asyncio.to_thread(bot.genai_model.generate_content, prompt)
         await interaction.response.send_message(
@@ -140,8 +142,10 @@ async def slash_dm(interaction: discord.Interaction):
 async def slash_pp(interaction: discord.Interaction):
     low, high = (15.0, 30.0) if interaction.user.id in OWNERS else (-5.0, 20.0)
     dick_len = round(random.uniform(low, high), 1)
+    emote_len = round(-(-dick_len // 4) - 1)
+    dick_emote = '' if emote_len < 0 else f':\t8{"-" if emote_len == 0 else "=" * emote_len + "D"}'
     await interaction.response.send_message(
-        f'{interaction.user.mention} chim của bạn dài {dick_len} cm'
+        f'{interaction.user.mention} chim của bạn dài {dick_len} cm{dick_emote}'
     )
 
 
@@ -162,7 +166,8 @@ async def slash_yes_or_yes(interaction: discord.Interaction):
 
 
 @bot.tree.command(name='banword', description='thêm một từ vào danh sách cấm', guild=GUILD)
-async def slash_ban_word(interaction: discord.Interaction, word: str):
+async def slash_ban_word(interaction: discord.Interaction,
+                         word: app_commands.Range[str, 1, 20]):
     if not interaction.user.guild_permissions.administrator:
         await interaction.response.send_message(
             f'{interaction.user.mention} bạn không có quyền sử dụng lệnh này!'
@@ -191,7 +196,8 @@ async def slash_ban_word(interaction: discord.Interaction, word: str):
 
 
 @bot.tree.command(name='unbanword', description='xóa một từ khỏi danh sách cấm', guild=GUILD)
-async def slash_unban_word(interaction: discord.Interaction, word: str):
+async def slash_unban_word(interaction: discord.Interaction,
+                           word: app_commands.Range[str, 1, 20]):
     if not interaction.user.guild_permissions.administrator:
         await interaction.response.send_message(
             f'{interaction.user.mention} bạn không có quyền sử dụng lệnh này!'
