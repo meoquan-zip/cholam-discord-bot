@@ -13,11 +13,8 @@ from language import normalise
 load_dotenv()  # load environment variables from .env
 keep_alive()  # prevent bot from automatically shutting down
 
-GUILD = discord.Object(id=867657564883386438)  # test server
-GOD_TIER = {
-    866878611063701525: 'speaver',
-    690179037397778477: 'meoquan'
-}
+GUILD = discord.Object(id=int(os.getenv('DISCORD_GUILD_ID')))  # test server
+OWNERS = set(int(oid) for oid in os.getenv('DISCORD_OWNER_IDS').split(','))  # ids of bot owners
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -57,7 +54,7 @@ class ChoCoBot(commands.Bot):
         except Exception as e:
             print(f'Failed to sync commands: {e}')
 
-    async def on_message(self, message):
+    async def on_message(self, message: discord.Message):
         if message.author.bot or not message.guild:
             return
 
@@ -141,7 +138,7 @@ async def slash_dm(interaction: discord.Interaction):
 
 @bot.tree.command(name='pp', description='đo kích thước cậu nhỏ của bạn', guild=GUILD)
 async def slash_pp(interaction: discord.Interaction):
-    low, high = (15.0, 30.0) if interaction.user.id in GOD_TIER else (-5.0, 20.0)
+    low, high = (15.0, 30.0) if interaction.user.id in OWNERS else (-5.0, 20.0)
     dick_len = round(random.uniform(low, high), 1)
     await interaction.response.send_message(
         f'{interaction.user.mention} chim của bạn dài {dick_len} cm'
